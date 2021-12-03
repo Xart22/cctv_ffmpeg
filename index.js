@@ -40,6 +40,7 @@ const startStream = (name, streamUrl, wsPort) => {
     wsPort,
     ffmpegOptions: {
       "-stats": "",
+      "-rtsp_transport": tcp,
       "-r": 30,
     },
   });
