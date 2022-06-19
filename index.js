@@ -1,74 +1,25 @@
-const app = require("express")();
-const Stream = require("node-rtsp-stream");
+const { exec } = require("child_process");
 
-app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "*");
+const PORT = 4000;
 
-  // Request methods you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-
-  // Request headers you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader("Access-Control-Allow-Credentials", true);
-
-  // Pass to next layer of middleware
-  next();
-});
-
-const stream_configs = [
-  {
-    key: "CCTVSTREAM",
-    port: 9090,
-    url: "rtsp://admin:adm12345@192.168.2.100/Streaming/Channels/101",
-  },
-];
-
-const startStream = (name, streamUrl, wsPort) => {
-  const stream = new Stream({
-    name,
-    streamUrl,
-    wsPort,
-    ffmpegOptions: {
-      "-stats": "",
-      "-rtsp_transport": tcp,
-      "-r": 30,
-    },
-  });
-};
-
-app.get("/start", (req, res) => {
-  const { url, port, key = "CCTVSTREAM" } = req.query;
-  if (!url && !port) {
-    return res.json({
-      message: "Wrong Input",
-    });
+exec(
+  `ffmpeg -i rtsp://admin:hik12345@118.96.244.84:554/Streaming/Channels/101/ -fflags flush_packets -max_delay 5 -flags -global_header -hls_time 5 -hls_list_size 3 -vcodec copy -y 'file location'`,
+  (err, stdout, stderr) => {
+    if (err) {
+      console.error(`exec error: ${err}`);
+      return;
+    }
+    console.log(`stdout: ${stdout}`);
+    console.log(`stderr: ${stderr}`);
   }
-  if (streams[port]) {
-    return res.json({
-      message: "Port Used",
-    });
-  }
+);
 
-  startStream(url, port, key);
-
-  res.json({
-    message: "Stream ON",
+const findRemoveSync = require("find-remove");
+setInterval(() => {
+  //'file location'
+  var result = findRemoveSync("file", {
+    age: { seconds: 30 },
+    extensions: ".ts",
   });
-});
-
-app.listen(8080, () => {
-  console.log("Server Running 8080");
-  stream_configs.forEach((config) => {
-    startStream(config.key, config.url, config.port);
-  });
-});
+  console.log(result);
+}, 5000);
