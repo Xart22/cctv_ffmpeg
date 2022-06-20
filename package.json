@@ -4,8 +4,8 @@
   "description": "stream rstp to mp3u",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node gps.js"
+    "dev": "nodemon gps.js",
+    "start": "node index.js"
   },
   "author": "Fajar",
   "license": "ISC",
@@ -14,5 +14,8 @@
     "find-remove": "^4.0.4",
     "gps": "^0.6.1",
     "serialport": "^10.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
   }
 }
